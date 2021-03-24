@@ -64,6 +64,7 @@ public abstract class AutoTasks_11712_A extends AutoMethods_11712_A{
                 }
                 break;
         }
+        sleep(500);
     }
 }
 
