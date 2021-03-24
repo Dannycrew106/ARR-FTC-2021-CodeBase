@@ -11,23 +11,23 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 public class TOP11712_V100 extends OpMode {
     DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    DcMotor flyWheel1, flyWheel2;
-
+    DcMotor flyWheel;
     DcMotor conveyorMotor;
-    DcMotor collectionMotor;
+    Servo fireServo;
 
     double speedCoefficient = 1;
 
-    final double FLY_WHEEL_POWER = 1, CONVEYOR_POWER = 1, COLLECTION_POWER = 1, WHEEL_POWER = 1, SPEED_INCREMENT = 0.2;
+    final double FLY_WHEEL_POWER = 1, CONVEYOR_POWER = 1, WHEEL_POWER = 1, SPEED_INCREMENT = 0.2, FIRE_SERVO_MAX = 1, FIRE_SERVO_MIN = 0;
 
-    boolean collector = false;
-    boolean flyWheels = false;
+    boolean conveyor = false;
+    boolean flyWheel = false;
     boolean reverse = false;
-    boolean toggleCollector = true;
-    boolean toggleFlyWheels = true;
+    boolean toggleConveyor = true;
+    boolean toggleFlyWheel = true;
     boolean toggleSpeedUp = true;
     boolean toggleSpeedDown = true;
     boolean toggleReverse = true;
+    boolean toggleFireServo = true;
 
 
     @Override
@@ -42,21 +42,19 @@ public class TOP11712_V100 extends OpMode {
         backRight = hardwareMap.dcMotor.get("back_right");
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        flyWheel1 = hardwareMap.dcMotor.get("fly_wheel_1");
-        flyWheel2 = hardwareMap.dcMotor.get("fly_wheel_2");
-        flyWheel2.setDirection(DcMotorSimple.Direction.REVERSE);
+        flyWheel = hardwareMap.dcMotor.get("fly_wheel");
         conveyorMotor = hardwareMap.dcMotor.get("conveyor_motor");
-        collectionMotor = hardwareMap.dcMotor.get("collection_motor");
+        fireServo = hardwareMap.servo.get("fire_servo");
+        
+        conveyorMotor.setPower(0);
+        flyWheel1.setPower(0);
+        flyWheel2.setPower(0);
 
         telemetry.addData("SYSTEMS", "ready.");
         telemetry.update();
     }
 
     public void loop() {
-        conveyorMotor.setPower(0);
-        collectionMotor.setPower(0);
-        flyWheel1.setPower(0);
-        flyWheel2.setPower(0);
 
         if (gamepad1.x && toggleReverse){
             toggleReverse = false;
@@ -123,49 +121,58 @@ public class TOP11712_V100 extends OpMode {
             toggleSpeedDown = true;
         }
 
-        if ((gamepad1.y && toggleFlyWheels && reverse) || (gamepad1.a && toggleFlyWheels && !reverse)){
-            toggleCollector = false;
-            if (!collector){
-                collector = true;
-                collectionMotor.setPower(COLLECTION_POWER);
+        if (gamepad1.a && toggleConveyor){
+            toggleConveyor = false;
+            if (!conveyor){
+                conveyor = true;
+                conveyorMotor.setPower(CONVEYOR_POWER);
 
-                telemetry.addData("Collection Motors: ", "ON");
+                telemetry.addData("Conveyor Motor: ", "ON");
             }
             else {
-                collector = false;
-                collectionMotor.setPower(0);
+                conveyor = false;
+                conveyorMotor.setPower(0);
 
-                telemetry.addData("Collection Motors: ", "OFF");
+                telemetry.addData("Conveyor Motor: ", "ON");
             }
             telemetry.update();
         }
-        else if ((!gamepad1.y && !reverse) || (!gamepad1.a && reverse)){
-            toggleCollector = true;
+        else if (!gamepad1.a){
+            toggleConveyor = true;
         }
 
 
-        if ((gamepad1.y && toggleFlyWheels && !reverse) || (gamepad1.a && toggleFlyWheels && reverse)){
-            toggleFlyWheels = false;
-            if (!flyWheels){
-                flyWheels = true;
-                flyWheel1.setPower(FLY_WHEEL_POWER);
-                flyWheel2.setPower(-FLY_WHEEL_POWER);
+        if (gamepad1.y && toggleFlyWheel){
+            toggleFlyWheel = false;
+            if (!flyWheel){
+                flyWheel = true;
+                flyWheel.setPower(FLY_WHEEL_POWER);
 
-                telemetry.addData("FlyWheels: ", "ON");
+                telemetry.addData("FlyWheel: ", "ON");
             }
             else {
-                flyWheels = false;
-                flyWheel1.setPower(0);
-                flyWheel2.setPower(0);
+                flyWheel = false;
+                flyWheel.setPower(0);
 
-                telemetry.addData("FlyWheels: ", "OFF");
+                telemetry.addData("FlyWheel: ", "OFF");
             }
             telemetry.update();
         }
-        else if ((!gamepad1.y && !reverse) || (!gamepad1.a && reverse)){
-            toggleFlyWheels = true;
+        else if (!gamepad1.y){
+            toggleFlyWheel = true;
+        }
+        
+        if (gamepad.b && toggleFireServo){
+            toggleFireServo = false;
+            fireServo.setPosition(FIRE_SERVO_MAX);
+            sleep(500);
+            fireServo.setPosition(FIRE_SERVO_MIN);
+            telemetry.addData("READY TO", " FIRE");
+            telemetry.update();
+        }
+        else if (!gamepad.b){
+            toggleFireServo = true;
         }
 
-        while (gamepad1.b) {conveyorMotor.setPower(CONVEYOR_POWER);}
     }
 }
