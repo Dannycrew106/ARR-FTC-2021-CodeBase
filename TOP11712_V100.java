@@ -20,8 +20,9 @@ public class TOP11712_V100 extends OpMode {
     final double FLY_WHEEL_POWER = 1, CONVEYOR_POWER = 1, WHEEL_POWER = 1, SPEED_INCREMENT = 0.2, FIRE_SERVO_MAX = 1, FIRE_SERVO_MIN = 0;
 
     boolean conveyor = false;
-    boolean flyWheel = false;
+    boolean flyWheelControl = false;
     boolean reverse = false;
+    boolean fireServoControl = false;
     boolean toggleConveyor = true;
     boolean toggleFlyWheel = true;
     boolean toggleSpeedUp = true;
@@ -44,11 +45,10 @@ public class TOP11712_V100 extends OpMode {
 
         flyWheel = hardwareMap.dcMotor.get("fly_wheel");
         conveyorMotor = hardwareMap.dcMotor.get("conveyor_motor");
-        fireServo = hardwareMap.servo.get("fire_servo");
-        
+        //fireServo = hardwareMap.servo.get("fire_servo");
+
         conveyorMotor.setPower(0);
-        flyWheel1.setPower(0);
-        flyWheel2.setPower(0);
+        flyWheel.setPower(0);
 
         telemetry.addData("SYSTEMS", "ready.");
         telemetry.update();
@@ -133,7 +133,7 @@ public class TOP11712_V100 extends OpMode {
                 conveyor = false;
                 conveyorMotor.setPower(0);
 
-                telemetry.addData("Conveyor Motor: ", "ON");
+                telemetry.addData("Conveyor Motor: ", "OFF");
             }
             telemetry.update();
         }
@@ -144,14 +144,14 @@ public class TOP11712_V100 extends OpMode {
 
         if (gamepad1.y && toggleFlyWheel){
             toggleFlyWheel = false;
-            if (!flyWheel){
-                flyWheel = true;
+            if (!flyWheelControl){
+                flyWheelControl = true;
                 flyWheel.setPower(FLY_WHEEL_POWER);
 
                 telemetry.addData("FlyWheel: ", "ON");
             }
             else {
-                flyWheel = false;
+                flyWheelControl = false;
                 flyWheel.setPower(0);
 
                 telemetry.addData("FlyWheel: ", "OFF");
@@ -161,18 +161,13 @@ public class TOP11712_V100 extends OpMode {
         else if (!gamepad1.y){
             toggleFlyWheel = true;
         }
-        
-        if (gamepad.b && toggleFireServo){
-            toggleFireServo = false;
-            fireServo.setPosition(FIRE_SERVO_MAX);
-            sleep(500);
-            fireServo.setPosition(FIRE_SERVO_MIN);
-            telemetry.addData("READY TO", " FIRE");
-            telemetry.update();
-        }
-        else if (!gamepad.b){
-            toggleFireServo = true;
-        }
 
+        /*if (gamepad1.b) {
+            fireServo.setPosition(FIRE_SERVO_MAX);
+        }
+        else {
+            fireServo.setPosition(FIRE_SERVO_MIN);
+        }
+        */
     }
 }
